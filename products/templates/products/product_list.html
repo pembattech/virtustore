@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %} Products {% endblock title%}
+{% block content %}
+
+{% for product in products_with_price %}
+<div class="card" style="width: 18rem">
+  <img class="card-img-top" src="{{product.thumbnail.url}}" alt="{{product.thumbnail.url}}" />
+  <div class="card-body">
+    <h5 class="card-title">{{product.name}}</h5>
+    <p class="card-text">{{product.desc}}</p>
+    <p class="card-text">{{product.price.price}}</p>
+    <a href="{% url 'product:product_detail' product.slug %}" class="btn btn-primary">View Detail</a>
+  </div>
+</div>
+
+{% endfor %} {% endblock content %}
