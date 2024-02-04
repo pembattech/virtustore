@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.conf import settings
 from django.http import JsonResponse
 import stripe
@@ -31,8 +31,11 @@ def create_stripe_checkout_session(request, slug):
     """
     Create a checkout session and return the session ID
     """
+    
 
     product = get_object_or_404(Product, slug=slug)
+
+    print(f"{settings.BACKEND_DOMAIN}{product.thumbnail.url}")
 
     checkout_session = stripe.checkout.Session.create(
         payment_method_types=["card"],
@@ -44,7 +47,6 @@ def create_stripe_checkout_session(request, slug):
                     "product_data": {
                         "name": product.name,
                         "description": product.desc,
-                        "images": [f"{settings.BACKEND_DOMAIN}/{product.thumbnail}"],
                     },
                 },
                 "quantity": product.quantity,
@@ -56,4 +58,11 @@ def create_stripe_checkout_session(request, slug):
         cancel_url=settings.PAYMENT_CANCEL_URL,
     )
 
-    return JsonResponse({"sessionId": checkout_session.id})
+
+    return redirect(checkout_session.url)
+
+def payment_success(request):
+    return render(request, 'products/payment_success.html')
+
+def payment_cancel(request):
+    return render(request, 'products/payment_cancel.html')
